@@ -10,7 +10,7 @@ from django.utils import timezone
 
 from .forms import AlterarSenhaForm, ChamadoForm, LoginForm, ProjetoForm, UsuarioForm
 from .models import Chamado, Perfil, Projeto
-from .permissions import atendente_required, eh_colaborador_ti, get_perfil, gestor_ou_ti_required
+from .permissions import atendente_required, eh_colaborador_ti, get_perfil, gestor_ou_ti_required, status_required
 from .services import enviar_chamado_glpi
 
 MAX_TENTATIVAS_LOGIN = 5
@@ -137,14 +137,20 @@ def chamados_view(request):
         objetos = Chamado.objects.filter(usuario=request.user.username)
 
     texto = request.GET.get('q', '').strip()
-    status = request.GET.get('status', '')
-    prioridade = request.GET.get('prioridade', '')
+    status = request.GET.get('status', '').strip()
+    prioridade = request.GET.get('prioridade', '').strip()
     if texto:
         objetos = objetos.filter(Q(titulo__icontains=texto) | Q(descricao__icontains=texto))
-    if status:
+    status_validos = {value for value, _ in Chamado.STATUS_CHOICES}
+    prioridades_validas = {value for value, _ in Chamado.PRIORIDADE_CHOICES}
+    if status in status_validos:
         objetos = objetos.filter(status=status)
-    if prioridade:
+    else:
+        status = ''
+    if prioridade in prioridades_validas:
         objetos = objetos.filter(prioridade=prioridade)
+    else:
+        prioridade = ''
 
     objetos = objetos.order_by('-data_criacao')
     pagina = Paginator(objetos, 10).get_page(request.GET.get('page'))
@@ -224,14 +230,20 @@ def projetos_view(request):
         objetos = Projeto.objects.all()
 
     texto = request.GET.get('q', '').strip()
-    status = request.GET.get('status', '')
-    prioridade = request.GET.get('prioridade', '')
+    status = request.GET.get('status', '').strip()
+    prioridade = request.GET.get('prioridade', '').strip()
     if texto:
         objetos = objetos.filter(Q(titulo__icontains=texto) | Q(descricao_problema__icontains=texto))
-    if status:
+    status_validos = {value for value, _ in Projeto.STATUS_CHOICES}
+    prioridades_validas = {value for value, _ in Projeto.PRIORIDADE_CHOICES}
+    if status in status_validos:
         objetos = objetos.filter(status=status)
-    if prioridade:
+    else:
+        status = ''
+    if prioridade in prioridades_validas:
         objetos = objetos.filter(prioridade=prioridade)
+    else:
+        prioridade = ''
 
     objetos = objetos.order_by('-data_criacao')
     pagina = Paginator(objetos, 10).get_page(request.GET.get('page'))
@@ -279,7 +291,7 @@ def projeto_create_view(request):
 
 
 @login_required(login_url='login')
-@atendente_required
+@status_required
 def chamado_status_update_view(request, pk):
     chamado = get_object_or_404(Chamado, pk=pk)
     perfil = get_perfil(request.user)
@@ -329,7 +341,7 @@ def projeto_pegar_view(request, pk):
 
 
 @login_required(login_url='login')
-@atendente_required
+@status_required
 def projeto_status_update_view(request, pk):
     projeto = get_object_or_404(Projeto, pk=pk)
     perfil = get_perfil(request.user)

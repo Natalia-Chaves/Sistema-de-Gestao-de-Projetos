@@ -12,9 +12,9 @@ Além do login simples, o sistema possui um modelo de permissões por papel:
 | Papel | O que vê | O que pode fazer |
 |---|---|---|
 | **Colaborador** | Apenas os próprios chamados; todos os projetos | Abrir chamados e projetos |
-| **Colaborador de área TI** (recurso extra) | Todos os chamados, de qualquer área | Tudo do Colaborador + alterar status de qualquer chamado + "pegar" chamados na **Esteira** |
+| **Colaborador de área TI** (recurso extra) | Todos os chamados, de qualquer área | Tudo do Colaborador + alterar status de qualquer chamado/projeto + "pegar" chamados e projetos na **Esteira** |
 | **Gestor de área** | Chamados e projetos da sua área | Abrir chamados/projetos + alterar status dos itens da sua área + criar Colaboradores da própria área |
-| **Gestor de Desenvolvimento** | Todos os chamados e projetos, de todas as áreas | Tudo dos gestores de área + criar/gerenciar acessos de colaboradores e gestores de qualquer área |
+| **Gestor de Desenvolvimento** | Todos os chamados e projetos, de todas as áreas | Tudo dos gestores de área + acessar a **Esteira**, pegar chamados/projetos e criar/gerenciar acessos de qualquer área |
 
 Áreas disponíveis: Engenharia, Produção, Manutenção, Qualidade, Suprimentos, Administrativo, TI.
 

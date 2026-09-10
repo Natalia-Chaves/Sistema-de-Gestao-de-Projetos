@@ -45,7 +45,7 @@
                 <td class="p-2 border border-border">{{ projeto.area_solicitante }}</td>
                 <td class="p-2 border border-border">{{ projeto.prioridade }}</td>
                 <td class="p-2 border border-border">
-                    {% if user_pode_atender %}
+                    {% if user_pode_alterar_status %}
                     <form method="post" action="{% url 'projeto_status_update' projeto.pk %}" class="flex gap-1" data-confirm-status>
                         {% csrf_token %}
                         <select name="status" class="border border-border rounded p-1 text-xs" onchange="this.form.submit()">

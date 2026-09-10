@@ -25,13 +25,17 @@ def gestor_ou_ti_required(view_func):
 
 
 def pode_atender_chamados(perfil):
-    if perfil.papel in (Perfil.PAPEL_GESTOR, Perfil.PAPEL_GESTOR_TI):
-        return True
-    return perfil.papel == Perfil.PAPEL_COLABORADOR and perfil.area == 'TI'
+    return perfil.papel == Perfil.PAPEL_GESTOR_TI or (
+        perfil.papel == Perfil.PAPEL_COLABORADOR and perfil.area == 'TI'
+    )
 
 
 def eh_colaborador_ti(perfil):
     return perfil.papel == Perfil.PAPEL_COLABORADOR and perfil.area == 'TI'
+
+
+def pode_alterar_status(perfil):
+    return perfil.papel in (Perfil.PAPEL_GESTOR, Perfil.PAPEL_GESTOR_TI) or pode_atender_chamados(perfil)
 
 
 def atendente_required(view_func):
@@ -39,6 +43,16 @@ def atendente_required(view_func):
     def wrapper(request, *args, **kwargs):
         if not pode_atender_chamados(get_perfil(request.user)):
             messages.error(request, 'Você não tem permissão para atender chamados ou projetos.')
+            return redirect('dashboard')
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+
+def status_required(view_func):
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if not pode_alterar_status(get_perfil(request.user)):
+            messages.error(request, 'Você não tem permissão para alterar status.')
             return redirect('dashboard')
         return view_func(request, *args, **kwargs)
     return wrapper

@@ -165,6 +165,16 @@ class PapelPermissaoTests(TestCase):
         response = self.client.get(reverse('esteira'), follow=True)
         self.assertRedirects(response, reverse('dashboard'))
 
+    def test_gestor_de_desenvolvimento_acessa_esteira(self):
+        self.client.login(username='ti1', password='senha123')
+        response = self.client.get(reverse('esteira'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_gestor_de_area_nao_acessa_esteira(self):
+        self.client.login(username='gestor1', password='senha123')
+        response = self.client.get(reverse('esteira'), follow=True)
+        self.assertRedirects(response, reverse('dashboard'))
+
     def test_gestor_ti_ve_todos_os_chamados(self):
         self.client.login(username='ti1', password='senha123')
         response = self.client.get(reverse('chamados'))
