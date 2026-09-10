@@ -3,7 +3,7 @@
 Aplicação Django para abertura e acompanhamento de chamados (com integração ao GLPI)
 e de solicitações de novos projetos de desenvolvimento.
 
-🔗 **Aplicação publicada:** https://sistema-de-gestao-de-projetos.onrender.com
+🔗 **Aplicação publicada:** https://sistema-de-gestao-de-projetos.onrender.com (apenas o link de acesso, sem instruções de deploy neste README)
 
 ## Papéis de acesso (recurso extra)
 
@@ -130,7 +130,7 @@ validação de campo obrigatório vazio, criação de projeto e tela de detalhes
 
 ## Guia de teste
 
-### Usuários de teste (local)
+### Usuários de teste
 
 Contas para testar cada papel (senha = a própria matrícula, será pedida a troca no
 primeiro login):
@@ -159,8 +159,8 @@ primeiro login):
 ### 2. Abrir e consultar chamados (RF-04 a RF-10)
 1. Logado como qualquer usuário, vá em **Chamados → Novo chamado**.
 2. Tente salvar sem preencher a descrição — deve validar e não deixar salvar.
-3. Preencha título, descrição, categoria e prioridade e salve. Deve aparecer uma mensagem
-   informando que o chamado foi registrado (real ou simulado no GLPI) com um ID.
+3. Preencha título, descrição, categoria e prioridade e salve. Deve aparecer a mensagem
+   "Chamado registrado com sucesso.".
 4. Na listagem de **Chamados**, confirme que o novo chamado aparece com o status "Novo" e o
    ID do GLPI preenchido.
 5. Clique no título do chamado — deve abrir a tela de **detalhe** com todos os campos.
