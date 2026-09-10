@@ -25,3 +25,40 @@ jobs:
           SECRET_KEY: chave-de-teste-ci
           DEBUG: 'True'
         run: python manage.py test
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Criar .env para o docker compose
+        run: |
+          cp .env.example .env
+          sed -i 's/^SECRET_KEY=.*/SECRET_KEY=chave-de-teste-docker/' .env
+          sed -i 's/^DEBUG=.*/DEBUG=False/' .env
+          sed -i 's/^ALLOWED_HOSTS=.*/ALLOWED_HOSTS=localhost,127.0.0.1/' .env
+
+      - name: Subir a stack (nginx + web + postgres)
+        run: docker compose up --build -d
+
+      - name: Esperar a aplicação responder em http://localhost:8080
+        run: |
+          for i in $(seq 1 30); do
+            status=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/ || echo 000)
+            if [ "$status" = "200" ] || [ "$status" = "302" ]; then
+              echo "Aplicação respondeu com HTTP $status"
+              exit 0
+            fi
+            echo "Tentativa $i: HTTP $status, aguardando..."
+            sleep 3
+          done
+          echo "Aplicação não respondeu a tempo"
+          exit 1
+
+      - name: Logs em caso de falha
+        if: failure()
+        run: docker compose logs
+
+      - name: Derrubar a stack
+        if: always()
+        run: docker compose down -v
