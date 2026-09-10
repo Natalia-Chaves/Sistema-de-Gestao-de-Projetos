@@ -10,20 +10,25 @@ Além do login simples, o sistema possui um modelo de permissões por papel:
 | Papel | O que vê | O que pode fazer |
 |---|---|---|
 | **Colaborador** | Apenas os próprios chamados; todos os projetos | Abrir chamados e projetos |
-| **Gestor de área** | Chamados e projetos da sua área | Abrir chamados/projetos + alterar status dos itens da sua área |
-| **Gestor de Desenvolvimento** | Todos os chamados e projetos, de todas as áreas | Tudo dos gestores de área + criar/gerenciar acessos de colaboradores e gestores |
+| **Colaborador de área TI** (recurso extra) | Todos os chamados, de qualquer área | Tudo do Colaborador + alterar status de qualquer chamado + "pegar" chamados na **Esteira** |
+| **Gestor de área** | Chamados e projetos da sua área | Abrir chamados/projetos + alterar status dos itens da sua área + criar Colaboradores da própria área |
+| **Gestor de Desenvolvimento** | Todos os chamados e projetos, de todas as áreas | Tudo dos gestores de área + criar/gerenciar acessos de colaboradores e gestores de qualquer área |
 
 Áreas disponíveis: Engenharia, Produção, Manutenção, Qualidade, Suprimentos, Administrativo, TI.
 
 - Um usuário criado via `createsuperuser` é tratado automaticamente como **Gestor de Desenvolvimento**
   (mesmo sem um registro em `Perfil`), podendo acessar `/usuarios/` e cadastrar os
   demais acessos.
+- Qualquer **Colaborador com área = TI** vira automaticamente um atendente: consegue ver a fila
+  de chamados sem atendimento em **Esteira**, "pegar" um chamado (vincula a si e muda o status
+  para "Em atendimento") e alterar o status de qualquer chamado, não só o próprio.
 - O Gestor de Desenvolvimento cria colaboradores e gestores de área em **Usuários → Novo usuário**,
-  escolhendo o papel e a área de cada um.
+  escolhendo papel e área livremente. O Gestor de área também acessa essa tela, mas só consegue
+  criar **Colaboradores da própria área** (os campos de papel/área ficam travados no formulário).
 - O **login é feito com e-mail e senha**. A matrícula continua existindo como identificação
   interna do colaborador (deve conter apenas números), mas não é mais usada para logar.
-- O Gestor de Desenvolvimento não define senha na criação: **a senha inicial é a própria matrícula**
-  do colaborador/gestor. O usuário pode trocá-la depois em **Alterar senha**.
+- O Gestor não define senha na criação: **a senha inicial é a própria matrícula**
+  do colaborador. O usuário pode trocá-la depois em **Alterar senha**.
 
 ## Stack
 
@@ -140,11 +145,81 @@ validação de campo obrigatório vazio, criação de projeto e tela de detalhes
 
 | Módulo | Itens |
 |---|---|
-| Acesso | Login, identificação do usuário logado, portal com acesso a Chamados e Projetos |
-| Chamados | Abertura, campos obrigatórios (título, descrição, categoria, prioridade), integração GLPI real/mock, ID do GLPI, listagem, status |
-| Projetos | Abertura, campos obrigatórios (título, área, descrição, objetivo, prioridade), campos opcionais (benefício, prazo), ID único, listagem, fluxo de status, tela de detalhes |
+| Acesso | Login (e-mail + senha), identificação do usuário logado, portal com acesso a Chamados e Projetos |
+| Chamados | Abertura, campos obrigatórios (título, descrição, categoria, prioridade), integração GLPI real/mock, ID do GLPI, listagem com busca/filtro, tela de detalhes, status |
+| Esteira (recurso extra) | Fila de chamados sem atendimento, "pegar chamado" (atribui a si e muda o status) |
+| Projetos | Abertura, campos obrigatórios (título, área, descrição, objetivo, prioridade), campos opcionais (benefício, prazo), ID único, listagem com busca/filtro, fluxo de status, tela de detalhes |
+| Dashboard | Totais e contagem por status de chamados e projetos, filtrados pelo papel/área de quem está logado |
 | Auditoria | Data de criação e última atualização em todos os registros |
 | Erros | Validação de formulário e tratamento de falha de integração com mensagens claras |
+
+---
+
+## Guia de teste
+
+Contas já cadastradas para testar cada papel (senha = a própria matrícula, será pedida a troca no primeiro login):
+
+| E-mail | Matrícula (senha) | Papel | Área |
+|---|---|---|---|
+| gestorti@empresa.com | 01 | Gestor de Desenvolvimento | — |
+| atendenteti@empresa.com | 02 | Colaborador (atendente de TI) | TI |
+| gestorengenharia@empresa.com | 03 | Gestor de área | Engenharia |
+
+### 1. Login e identificação (RF-01, RF-02, RF-03)
+1. Acesse a tela de login — deve exibir o nome "Sistema de Gestão de Chamados".
+2. Entre com `gestorti@empresa.com` / `01`. Como a senha é a própria matrícula, o sistema deve
+   redirecionar para **Alterar senha** antes de liberar o resto do sistema.
+3. Troque a senha e confirme que é redirecionado ao **Dashboard**, com seu nome/papel visíveis
+   no menu superior e a faixa "Portal: Gestor de Desenvolvimento" logo abaixo.
+4. Tente digitar uma senha errada 5 vezes seguidas: o sistema deve bloquear novas tentativas
+   por alguns minutos.
+
+### 2. Abrir e consultar chamados (RF-04 a RF-10)
+1. Logado como qualquer usuário, vá em **Chamados → Novo chamado**.
+2. Tente salvar sem preencher a descrição — deve validar e não deixar salvar.
+3. Preencha título, descrição, categoria e prioridade e salve. Deve aparecer uma mensagem
+   informando que o chamado foi registrado (real ou simulado no GLPI) com um ID.
+4. Na listagem de **Chamados**, confirme que o novo chamado aparece com o status "Novo" e o
+   ID do GLPI preenchido.
+5. Clique no título do chamado — deve abrir a tela de **detalhe** com todos os campos.
+6. Use os filtros de busca/status/prioridade no topo da listagem e confirme que a lista é
+   filtrada corretamente.
+
+### 3. Esteira e atendimento de TI (recurso extra)
+1. Faça login como `atendenteti@empresa.com` / `02` (Colaborador da área TI).
+2. No menu, deve aparecer o link **Esteira** — acesse e confirme que aparecem todos os
+   chamados com status "Novo" e sem atendente, de qualquer área.
+3. Clique em **Pegar chamado** em um deles — deve sumir da esteira, e na listagem de
+   **Chamados** ele deve aparecer com status "Em atendimento" e você como atendente.
+4. Faça login com um Colaborador comum (papel Colaborador, área diferente de TI) e confirme
+   que o link **Esteira** não aparece e que `/esteira/` redireciona para o Dashboard.
+
+### 4. Projetos (RF-11 a RF-17)
+1. Vá em **Projetos → Novo projeto** e tente salvar sem preencher objetivo — deve validar.
+2. Preencha todos os campos obrigatórios (título, área, descrição do problema, objetivo,
+   prioridade) e deixe benefício/prazo em branco — deve salvar normalmente (são opcionais).
+3. Na listagem, clique no título do projeto e confirme que a tela de detalhe mostra todos
+   os dados, inclusive os campos opcionais quando preenchidos.
+4. Logado como `gestorengenharia@empresa.com` / `03`, altere o status de um projeto da área
+   Engenharia — deve funcionar. Tente alterar um projeto de outra área — deve ser bloqueado.
+
+### 5. Papéis e controle de acesso (recurso extra)
+1. Logado como `gestorengenharia@empresa.com` / `03`, vá em **Usuários → Novo usuário**.
+   Os campos Papel e Área devem aparecer travados em "Colaborador" / "Engenharia".
+2. Crie um colaborador — confirme que ele só consegue ver os próprios chamados ao logar.
+3. Logado como `gestorti@empresa.com` / `01`, confirme que os campos Papel/Área ficam
+   livres e que é possível criar um Gestor de área em qualquer área.
+4. Tente acessar `/usuarios/` logado como um Colaborador comum — deve ser redirecionado
+   ao Dashboard com uma mensagem de acesso negado.
+
+### 6. Dashboard (RF-19) e auditoria (RF-20)
+1. Compare o Dashboard logado como Colaborador (só os próprios chamados), Gestor de área
+   (só a própria área) e Gestor de Desenvolvimento (tudo) — os totais e a contagem por
+   status devem mudar de acordo com o papel.
+2. Abra o admin do Django (`/admin/`, com um superusuário) e confirme que todo chamado/
+   projeto tem `data_criacao` e `data_atualizacao` preenchidos automaticamente.
+
+---
 
 ## Registro da entrega
 
@@ -155,9 +230,10 @@ validação de campo obrigatório vazio, criação de projeto e tela de detalhes
 - Versão do Python: 3.12
 - Versão do Django: 6.1.1
 - Banco utilizado: PostgreSQL (Docker) / SQLite (local)
-- Funcionalidades adicionais implementadas: dashboard com indicadores, tela de
-  detalhes do projeto, admin do Django para gestão de chamados/projetos, Docker
-  para deploy em produção (Render).
+- Funcionalidades adicionais implementadas: dashboard com indicadores por papel/área, tela de
+  detalhes do chamado e do projeto, esteira de atendimento para colaboradores da área de TI,
+  admin do Django para gestão de chamados/projetos, login por e-mail, Docker para deploy em
+  produção (Render).
 - Observações gerais: integração com o GLPI entregue em **modo simulado (mock)**,
   por não haver ambiente GLPI disponível para testes reais. O código de integração
   via API REST (`core/glpi_client.py`) está implementado e pronto para uso — basta

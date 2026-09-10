@@ -14,16 +14,6 @@ def get_perfil(user):
     return Perfil(user=user, papel=papel, area='')
 
 
-def gestor_ti_required(view_func):
-    @wraps(view_func)
-    def wrapper(request, *args, **kwargs):
-        if get_perfil(request.user).papel != Perfil.PAPEL_GESTOR_TI:
-            messages.error(request, 'Apenas o Gestor de Desenvolvimento pode acessar esta área.')
-            return redirect('dashboard')
-        return view_func(request, *args, **kwargs)
-    return wrapper
-
-
 def gestor_ou_ti_required(view_func):
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):

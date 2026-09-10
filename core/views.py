@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 
 from .forms import AlterarSenhaForm, ChamadoForm, LoginForm, ProjetoForm, UsuarioForm
 from .models import Chamado, Perfil, Projeto
-from .permissions import atendente_required, eh_colaborador_ti, get_perfil, gestor_ou_ti_required, gestor_ti_required, pode_atender_chamados
+from .permissions import atendente_required, eh_colaborador_ti, get_perfil, gestor_ou_ti_required
 from .services import enviar_chamado_glpi
 
 MAX_TENTATIVAS_LOGIN = 5
