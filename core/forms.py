@@ -8,10 +8,9 @@ INPUT_CLASS = 'w-full border border-border rounded-md p-2 focus:outline-none foc
 
 
 class LoginForm(forms.Form):
-    username = forms.CharField(
-        label='Matrícula',
-        max_length=150,
-        widget=forms.TextInput(attrs={'class': INPUT_CLASS}),
+    email = forms.EmailField(
+        label='E-mail',
+        widget=forms.EmailInput(attrs={'class': INPUT_CLASS}),
     )
     password = forms.CharField(
         label='Senha',
@@ -80,6 +79,16 @@ class UsuarioForm(forms.Form):
         widget=forms.Select(attrs={'class': INPUT_CLASS}),
     )
 
+    def __init__(self, *args, area_fixa=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if area_fixa:
+            self.fields['papel'].choices = [(Perfil.PAPEL_COLABORADOR, 'Colaborador')]
+            self.fields['papel'].initial = Perfil.PAPEL_COLABORADOR
+            self.fields['papel'].widget.attrs['disabled'] = True
+            self.fields['area'].choices = [(area_fixa, dict(Perfil._meta.get_field('area').choices).get(area_fixa, area_fixa))]
+            self.fields['area'].initial = area_fixa
+            self.fields['area'].widget.attrs['disabled'] = True
+
     def clean_username(self):
         username = self.cleaned_data['username']
         if not username.isdigit():
@@ -88,6 +97,13 @@ class UsuarioForm(forms.Form):
         if get_user_model().objects.filter(username=username).exists():
             raise forms.ValidationError('Já existe um usuário com essa matrícula.')
         return username
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        from django.contrib.auth import get_user_model
+        if get_user_model().objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError('Já existe um usuário com esse e-mail.')
+        return email
 
 
 class AlterarSenhaForm(forms.Form):

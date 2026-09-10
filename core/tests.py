@@ -19,7 +19,7 @@ class AuthAndFlowTests(TestCase):
 
     def test_user_can_login_and_access_dashboard(self):
         response = self.client.post(reverse('login'), {
-            'username': 'usuario',
+            'email': 'usuario@email.com',
             'password': 'senha123',
         }, follow=True)
         self.assertTrue(response.context['user'].is_authenticated)
@@ -69,13 +69,16 @@ class PapelPermissaoTests(TestCase):
         User = get_user_model()
 
         self.colaborador = User.objects.create_user(username='colab1', password='senha123')
-        Perfil.objects.create(user=self.colaborador, papel=Perfil.PAPEL_COLABORADOR, area='TI')
+        Perfil.objects.create(user=self.colaborador, papel=Perfil.PAPEL_COLABORADOR, area='Qualidade')
 
         self.gestor = User.objects.create_user(username='gestor1', password='senha123')
         Perfil.objects.create(user=self.gestor, papel=Perfil.PAPEL_GESTOR, area='TI')
 
         self.gestor_ti = User.objects.create_user(username='ti1', password='senha123')
         Perfil.objects.create(user=self.gestor_ti, papel=Perfil.PAPEL_GESTOR_TI, area='')
+
+        self.atendente_ti = User.objects.create_user(username='atd1', password='senha123')
+        Perfil.objects.create(user=self.atendente_ti, papel=Perfil.PAPEL_COLABORADOR, area='TI')
 
         self.chamado_ti = Chamado.objects.create(
             titulo='Chamado da área TI', descricao='desc', categoria='Sistema',
@@ -97,6 +100,25 @@ class PapelPermissaoTests(TestCase):
         response = self.client.get(reverse('chamados'))
         self.assertContains(response, 'Chamado da área TI')
         self.assertNotContains(response, 'Chamado de outra área')
+
+    def test_atendente_ti_ve_todos_os_chamados(self):
+        self.client.login(username='atd1', password='senha123')
+        response = self.client.get(reverse('chamados'))
+        self.assertContains(response, 'Chamado da área TI')
+        self.assertContains(response, 'Chamado de outra área')
+
+    def test_atendente_ti_pode_pegar_chamado_da_esteira(self):
+        self.client.login(username='atd1', password='senha123')
+        response = self.client.post(reverse('chamado_pegar', args=[self.chamado_outra_area.pk]))
+        self.assertEqual(response.status_code, 302)
+        self.chamado_outra_area.refresh_from_db()
+        self.assertEqual(self.chamado_outra_area.atendente, self.atendente_ti)
+        self.assertEqual(self.chamado_outra_area.status, 'Em atendimento')
+
+    def test_colaborador_comum_nao_acessa_esteira(self):
+        self.client.login(username='colab1', password='senha123')
+        response = self.client.get(reverse('esteira'), follow=True)
+        self.assertRedirects(response, reverse('dashboard'))
 
     def test_gestor_ti_ve_todos_os_chamados(self):
         self.client.login(username='ti1', password='senha123')

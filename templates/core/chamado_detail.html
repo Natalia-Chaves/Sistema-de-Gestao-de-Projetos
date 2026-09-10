@@ -31,6 +31,10 @@
             <dd>{{ chamado.usuario }}</dd>
         </div>
         <div>
+            <dt class="font-semibold text-ink-secondary">Atendente</dt>
+            <dd>{% if chamado.atendente %}{{ chamado.atendente.get_full_name|default:chamado.atendente.username }}{% else %}Ainda não atribuído{% endif %}</dd>
+        </div>
+        <div>
             <dt class="font-semibold text-ink-secondary">ID GLPI</dt>
             <dd>{{ chamado.id_glpi|default:'-' }}</dd>
         </div>

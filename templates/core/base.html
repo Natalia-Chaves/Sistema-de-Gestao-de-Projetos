@@ -4,12 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Sistema de Chamados EQS{% endblock %}</title>
+    <title>{% block title %}Sistema de Gestão de Chamados{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { theme: { extend: {
             colors: {
-                eqs: {
+                brand: {
                     50: "#FEF2F2",
                     100: "#FDE8E8",
                     200: "#F9C8CA",
@@ -57,18 +57,24 @@
 <body class="bg-background text-ink min-h-screen">
     {% if user.is_authenticated %}
     <nav class="bg-primary text-white px-6 py-3 flex justify-between items-center">
-        <span class="font-bold">Sistema de Chamados EQS</span>
+        <span class="font-bold">Sistema de Gestão de Chamados</span>
         <div class="space-x-4">
             <a class="font-semibold hover:underline" href="{% url 'dashboard' %}">Dashboard</a>
             <a class="font-semibold hover:underline" href="{% url 'chamados' %}">Chamados</a>
             <a class="font-semibold hover:underline" href="{% url 'projetos' %}">Projetos</a>
-            {% if user_perfil.papel == 'gestor_ti' %}
+            {% if user_pode_atender %}
+            <a class="font-semibold hover:underline" href="{% url 'esteira' %}">Esteira</a>
+            {% endif %}
+            {% if user_perfil.papel == 'gestor_ti' or user_perfil.papel == 'gestor' %}
             <a class="font-semibold hover:underline" href="{% url 'usuarios' %}">Usuários</a>
             {% endif %}
             <span class="text-white/70">| {{ user.get_full_name|default:user.username }} ({{ user_perfil.get_papel_display }})</span>
             <a class="font-semibold hover:underline" href="{% url 'logout' %}">Sair</a>
         </div>
     </nav>
+    <div class="bg-dark-800 text-white/80 text-xs px-6 py-1">
+        Portal: <strong>{{ user_perfil.get_papel_display }}</strong>{% if user_perfil.area %} — Área: <strong>{{ user_perfil.get_area_display }}</strong>{% endif %}
+    </div>
     {% endif %}
 
     <div class="max-w-5xl mx-auto p-6">

@@ -20,9 +20,10 @@ Além do login simples, o sistema possui um modelo de permissões por papel:
   demais acessos.
 - O Gestor de Desenvolvimento cria colaboradores e gestores de área em **Usuários → Novo usuário**,
   escolhendo o papel e a área de cada um.
-- A **matrícula** (usada como usuário de login) deve conter apenas números.
+- O **login é feito com e-mail e senha**. A matrícula continua existindo como identificação
+  interna do colaborador (deve conter apenas números), mas não é mais usada para logar.
 - O Gestor de Desenvolvimento não define senha na criação: **a senha inicial é a própria matrícula**
-  do colaborador/gestor. O usuário pode trocá-la depois pelo admin do Django.
+  do colaborador/gestor. O usuário pode trocá-la depois em **Alterar senha**.
 
 ## Stack
 

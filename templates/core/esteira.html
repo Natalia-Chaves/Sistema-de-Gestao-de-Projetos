@@ -1,0 +1,43 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Esteira de chamados{% endblock %}
+
+{% block content %}
+<div class="bg-surface rounded-card shadow-card border border-border p-6">
+    <h2 class="text-xl font-bold mb-4">Esteira de chamados sem atendimento</h2>
+
+    <table class="w-full text-sm">
+        <thead>
+            <tr class="bg-background text-left">
+                <th class="p-2 border border-border">Título</th>
+                <th class="p-2 border border-border">Categoria</th>
+                <th class="p-2 border border-border">Prioridade</th>
+                <th class="p-2 border border-border">Área</th>
+                <th class="p-2 border border-border">Usuário</th>
+                <th class="p-2 border border-border"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for chamado in chamados %}
+            <tr>
+                <td class="p-2 border border-border">
+                    <a class="text-primary hover:underline" href="{% url 'chamado_detail' chamado.pk %}">{{ chamado.titulo }}</a>
+                </td>
+                <td class="p-2 border border-border">{{ chamado.categoria }}</td>
+                <td class="p-2 border border-border">{{ chamado.prioridade }}</td>
+                <td class="p-2 border border-border">{{ chamado.area|default:'-' }}</td>
+                <td class="p-2 border border-border">{{ chamado.usuario }}</td>
+                <td class="p-2 border border-border">
+                    <form method="post" action="{% url 'chamado_pegar' chamado.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="bg-primary text-white px-3 py-1 rounded-md hover:bg-primary-dark text-xs">Pegar chamado</button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td class="p-2 border border-border" colspan="6">Nenhum chamado aguardando atendimento.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

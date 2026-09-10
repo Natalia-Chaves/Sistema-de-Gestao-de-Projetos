@@ -32,3 +32,23 @@ def gestor_ou_ti_required(view_func):
             return redirect('dashboard')
         return view_func(request, *args, **kwargs)
     return wrapper
+
+
+def pode_atender_chamados(perfil):
+    if perfil.papel in (Perfil.PAPEL_GESTOR, Perfil.PAPEL_GESTOR_TI):
+        return True
+    return perfil.papel == Perfil.PAPEL_COLABORADOR and perfil.area == 'TI'
+
+
+def eh_colaborador_ti(perfil):
+    return perfil.papel == Perfil.PAPEL_COLABORADOR and perfil.area == 'TI'
+
+
+def atendente_required(view_func):
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if not pode_atender_chamados(get_perfil(request.user)):
+            messages.error(request, 'Você não tem permissão para atender chamados.')
+            return redirect('dashboard')
+        return view_func(request, *args, **kwargs)
+    return wrapper

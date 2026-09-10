@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 
 from .forms import AlterarSenhaForm, ChamadoForm, LoginForm, ProjetoForm, UsuarioForm
 from .models import Chamado, Perfil, Projeto
-from .permissions import get_perfil, gestor_ou_ti_required, gestor_ti_required
+from .permissions import atendente_required, eh_colaborador_ti, get_perfil, gestor_ou_ti_required, gestor_ti_required, pode_atender_chamados
 from .services import enviar_chamado_glpi
 
 MAX_TENTATIVAS_LOGIN = 5
@@ -23,9 +23,9 @@ def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data['username']
-            chave_bloqueio = f'login_bloqueado:{username}'
-            chave_tentativas = f'login_tentativas:{username}'
+            email = form.cleaned_data['email']
+            chave_bloqueio = f'login_bloqueado:{email}'
+            chave_tentativas = f'login_tentativas:{email}'
 
             if cache.get(chave_bloqueio):
                 messages.error(
@@ -34,11 +34,14 @@ def login_view(request):
                 )
                 return render(request, 'core/login.html', {'form': form})
 
-            user = authenticate(
-                request,
-                username=username,
-                password=form.cleaned_data['password'],
-            )
+            usuario_encontrado = User.objects.filter(email__iexact=email).first()
+            user = None
+            if usuario_encontrado is not None:
+                user = authenticate(
+                    request,
+                    username=usuario_encontrado.username,
+                    password=form.cleaned_data['password'],
+                )
             if user is not None:
                 cache.delete(chave_tentativas)
                 login(request, user)
@@ -90,7 +93,7 @@ def alterar_senha_view(request):
 @login_required(login_url='login')
 def dashboard_view(request):
     perfil = get_perfil(request.user)
-    if perfil.papel == Perfil.PAPEL_GESTOR_TI:
+    if perfil.papel == Perfil.PAPEL_GESTOR_TI or eh_colaborador_ti(perfil):
         chamados_qs = Chamado.objects.all()
         projetos_qs = Projeto.objects.all()
     elif perfil.papel == Perfil.PAPEL_GESTOR:
@@ -126,7 +129,7 @@ def dashboard_view(request):
 @login_required(login_url='login')
 def chamados_view(request):
     perfil = get_perfil(request.user)
-    if perfil.papel == Perfil.PAPEL_GESTOR_TI:
+    if perfil.papel == Perfil.PAPEL_GESTOR_TI or eh_colaborador_ti(perfil):
         objetos = Chamado.objects.all()
     elif perfil.papel == Perfil.PAPEL_GESTOR:
         objetos = Chamado.objects.filter(area=perfil.area)
@@ -164,6 +167,8 @@ def chamados_view(request):
 def chamado_detail_view(request, pk):
     chamado = get_object_or_404(Chamado, pk=pk)
     perfil = get_perfil(request.user)
+    if perfil.papel == Perfil.PAPEL_GESTOR_TI or eh_colaborador_ti(perfil):
+        return render(request, 'core/chamado_detail.html', {'chamado': chamado})
     if perfil.papel == Perfil.PAPEL_GESTOR and chamado.area != perfil.area:
         messages.error(request, 'Você só pode visualizar chamados da sua área.')
         return redirect('chamados')
@@ -274,7 +279,7 @@ def projeto_create_view(request):
 
 
 @login_required(login_url='login')
-@gestor_ou_ti_required
+@atendente_required
 def chamado_status_update_view(request, pk):
     chamado = get_object_or_404(Chamado, pk=pk)
     perfil = get_perfil(request.user)
@@ -287,6 +292,24 @@ def chamado_status_update_view(request, pk):
         chamado.save()
         messages.success(request, 'Status do chamado atualizado.')
     return redirect('chamados')
+
+
+@login_required(login_url='login')
+@atendente_required
+def esteira_view(request):
+    chamados = Chamado.objects.filter(atendente__isnull=True, status='Novo').order_by('data_criacao')
+    return render(request, 'core/esteira.html', {'chamados': chamados})
+
+
+@login_required(login_url='login')
+@atendente_required
+def chamado_pegar_view(request, pk):
+    chamado = get_object_or_404(Chamado, pk=pk, atendente__isnull=True)
+    chamado.atendente = request.user
+    chamado.status = 'Em atendimento'
+    chamado.save()
+    messages.success(request, 'Chamado atribuído a você.')
+    return redirect('esteira')
 
 
 @login_required(login_url='login')
@@ -306,21 +329,28 @@ def projeto_status_update_view(request, pk):
 
 
 @login_required(login_url='login')
-@gestor_ti_required
+@gestor_ou_ti_required
 def usuarios_view(request):
+    perfil = get_perfil(request.user)
     perfis = Perfil.objects.exclude(papel=Perfil.PAPEL_GESTOR_TI).select_related('user')
+    if perfil.papel == Perfil.PAPEL_GESTOR:
+        perfis = perfis.filter(area=perfil.area)
     return render(request, 'core/usuarios.html', {'perfis': perfis})
 
 
 @login_required(login_url='login')
-@gestor_ti_required
+@gestor_ou_ti_required
 def usuario_create_view(request):
+    perfil = get_perfil(request.user)
+    area_fixa = perfil.area if perfil.papel == Perfil.PAPEL_GESTOR else None
     if request.method == 'POST':
-        form = UsuarioForm(request.POST)
+        form = UsuarioForm(request.POST, area_fixa=area_fixa)
         if form.is_valid():
             nome_completo = form.cleaned_data['nome_completo'].strip()
             primeiro_nome, _, sobrenome = nome_completo.partition(' ')
             matricula = form.cleaned_data['username']
+            papel = Perfil.PAPEL_COLABORADOR if area_fixa else form.cleaned_data['papel']
+            area = area_fixa or form.cleaned_data['area']
             user = User.objects.create_user(
                 username=matricula,
                 email=form.cleaned_data['email'],
@@ -330,8 +360,8 @@ def usuario_create_view(request):
             )
             Perfil.objects.create(
                 user=user,
-                papel=form.cleaned_data['papel'],
-                area=form.cleaned_data['area'],
+                papel=papel,
+                area=area,
                 senha_temporaria=True,
             )
             messages.success(
@@ -341,5 +371,5 @@ def usuario_create_view(request):
             )
             return redirect('usuarios')
     else:
-        form = UsuarioForm()
+        form = UsuarioForm(area_fixa=area_fixa)
     return render(request, 'core/usuario_form.html', {'form': form, 'title': 'Novo usuário'})

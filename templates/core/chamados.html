@@ -35,6 +35,7 @@
                 <th class="p-2 border border-border">Prioridade</th>
                 <th class="p-2 border border-border">Área</th>
                 <th class="p-2 border border-border">Status</th>
+                <th class="p-2 border border-border">Atendente</th>
                 <th class="p-2 border border-border">ID GLPI</th>
                 <th class="p-2 border border-border">Usuário</th>
             </tr>
@@ -49,7 +50,7 @@
                 <td class="p-2 border border-border">{{ chamado.prioridade }}</td>
                 <td class="p-2 border border-border">{{ chamado.area|default:'-' }}</td>
                 <td class="p-2 border border-border">
-                    {% if user_perfil.papel == 'gestor_ti' or user_perfil.papel == 'gestor' %}
+                    {% if user_pode_atender %}
                     <form method="post" action="{% url 'chamado_status_update' chamado.pk %}" class="flex gap-1" data-confirm-status>
                         {% csrf_token %}
                         <select name="status" class="border border-border rounded p-1 text-xs" onchange="this.form.submit()">
@@ -62,11 +63,12 @@
                     {{ chamado.status }}
                     {% endif %}
                 </td>
+                <td class="p-2 border border-border">{% if chamado.atendente %}{{ chamado.atendente.get_full_name|default:chamado.atendente.username }}{% else %}-{% endif %}</td>
                 <td class="p-2 border border-border">{{ chamado.id_glpi|default:'-' }}</td>
                 <td class="p-2 border border-border">{{ chamado.usuario }}</td>
             </tr>
             {% empty %}
-            <tr><td class="p-2 border border-border" colspan="7">Nenhum chamado cadastrado.</td></tr>
+            <tr><td class="p-2 border border-border" colspan="8">Nenhum chamado cadastrado.</td></tr>
             {% endfor %}
         </tbody>
     </table>

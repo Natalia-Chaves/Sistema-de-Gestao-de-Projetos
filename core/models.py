@@ -60,6 +60,10 @@ class Chamado(models.Model):
     usuario = models.CharField(max_length=150, db_index=True)
     area = models.CharField(max_length=50, choices=AREA_CHOICES, blank=True, db_index=True)
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='Novo', db_index=True)
+    atendente = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='chamados_atendidos',
+    )
     id_glpi = models.CharField(max_length=100, blank=True, null=True)
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_atualizacao = models.DateTimeField(auto_now=True)
