@@ -3,6 +3,8 @@
 Aplicação Django para abertura e acompanhamento de chamados (com integração ao GLPI)
 e de solicitações de novos projetos de desenvolvimento.
 
+🔗 **Aplicação publicada:** https://sistema-de-gestao-de-projetos.onrender.com
+
 ## Papéis de acesso (recurso extra)
 
 Além do login simples, o sistema possui um modelo de permissões por papel:
