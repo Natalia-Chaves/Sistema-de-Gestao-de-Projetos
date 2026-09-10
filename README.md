@@ -157,13 +157,35 @@ validação de campo obrigatório vazio, criação de projeto e tela de detalhes
 
 ## Guia de teste
 
-Contas já cadastradas para testar cada papel (senha = a própria matrícula, será pedida a troca no primeiro login):
+### Usuários de teste
+
+Contas já cadastradas no banco local de desenvolvimento para testar cada papel
+(senha = a própria matrícula, será pedida a troca no primeiro login):
 
 | E-mail | Matrícula (senha) | Papel | Área |
 |---|---|---|---|
 | gestorti@empresa.com | 01 | Gestor de Desenvolvimento | — |
 | atendenteti@empresa.com | 02 | Colaborador (atendente de TI) | TI |
 | gestorengenharia@empresa.com | 03 | Gestor de área | Engenharia |
+
+> Essas contas existem apenas no banco local usado durante o desenvolvimento — não são
+> criadas automaticamente em um banco novo (ex.: ao rodar `migrate` do zero ou no deploy
+> no Render). Para recriá-las em outro ambiente, rode:
+> ```powershell
+> python manage.py shell -c "
+> from django.contrib.auth import get_user_model
+> from core.models import Perfil
+> U = get_user_model()
+> def cria(matricula, email, papel, area):
+>     if U.objects.filter(username=matricula).exists():
+>         return
+>     u = U.objects.create_user(username=matricula, email=email, password=matricula)
+>     Perfil.objects.create(user=u, papel=papel, area=area, senha_temporaria=True)
+> cria('01', 'gestorti@empresa.com', Perfil.PAPEL_GESTOR_TI, '')
+> cria('02', 'atendenteti@empresa.com', Perfil.PAPEL_COLABORADOR, 'TI')
+> cria('03', 'gestorengenharia@empresa.com', Perfil.PAPEL_GESTOR, 'Engenharia')
+> "
+> ```
 
 ### 1. Login e identificação (RF-01, RF-02, RF-03)
 1. Acesse a tela de login — deve exibir o nome "Sistema de Gestão de Chamados".
