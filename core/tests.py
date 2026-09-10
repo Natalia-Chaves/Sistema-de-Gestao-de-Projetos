@@ -115,6 +115,28 @@ class PapelPermissaoTests(TestCase):
         self.assertEqual(self.chamado_outra_area.atendente, self.atendente_ti)
         self.assertEqual(self.chamado_outra_area.status, 'Em atendimento')
 
+    def test_esteira_mostra_projetos_sem_atendimento(self):
+        projeto = Projeto.objects.create(
+            titulo='Projeto sem atendimento', area_solicitante='Qualidade',
+            descricao_problema='desc', objetivo='obj', prioridade='Alta',
+        )
+        self.client.login(username='atd1', password='senha123')
+        response = self.client.get(reverse('esteira'))
+        self.assertContains(response, 'Projeto sem atendimento')
+        self.assertIn(projeto, response.context['projetos'])
+
+    def test_atendente_ti_pode_pegar_projeto_da_esteira(self):
+        projeto = Projeto.objects.create(
+            titulo='Projeto para pegar', area_solicitante='Qualidade',
+            descricao_problema='desc', objetivo='obj', prioridade='Alta',
+        )
+        self.client.login(username='atd1', password='senha123')
+        response = self.client.post(reverse('projeto_pegar', args=[projeto.pk]))
+        self.assertEqual(response.status_code, 302)
+        projeto.refresh_from_db()
+        self.assertEqual(projeto.atendente, self.atendente_ti)
+        self.assertEqual(projeto.status, 'Em análise')
+
     def test_colaborador_comum_nao_acessa_esteira(self):
         self.client.login(username='colab1', password='senha123')
         response = self.client.get(reverse('esteira'), follow=True)
@@ -136,7 +158,7 @@ class PapelPermissaoTests(TestCase):
     def test_dashboard_gestor_ti_ve_total_geral(self):
         self.client.login(username='ti1', password='senha123')
         response = self.client.get(reverse('dashboard'))
-        self.assertEqual(response.context['total_chamados'], 2)
+        self.assertEqual(response.context['total_chamados'], Chamado.objects.count())
 
     def test_colaborador_nao_acessa_gestao_de_usuarios(self):
         self.client.login(username='colab1', password='senha123')

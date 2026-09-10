@@ -1,10 +1,10 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Esteira de chamados{% endblock %}
+{% block title %}Esteira{% endblock %}
 
 {% block content %}
-<div class="bg-surface rounded-card shadow-card border border-border p-6">
-    <h2 class="text-xl font-bold mb-4">Esteira de chamados sem atendimento</h2>
+<div class="bg-surface rounded-card shadow-card border border-border p-6 mb-6">
+    <h2 class="text-xl font-bold mb-4">Chamados sem atendimento</h2>
 
     <table class="w-full text-sm">
         <thead>
@@ -36,6 +36,40 @@
             </tr>
             {% empty %}
             <tr><td class="p-2 border border-border" colspan="6">Nenhum chamado aguardando atendimento.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="bg-surface rounded-card shadow-card border border-border p-6">
+    <h2 class="text-xl font-bold mb-4">Projetos sem atendimento</h2>
+
+    <table class="w-full text-sm">
+        <thead>
+            <tr class="bg-background text-left">
+                <th class="p-2 border border-border">Título</th>
+                <th class="p-2 border border-border">Área solicitante</th>
+                <th class="p-2 border border-border">Prioridade</th>
+                <th class="p-2 border border-border"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for projeto in projetos %}
+            <tr>
+                <td class="p-2 border border-border">
+                    <a class="text-primary hover:underline" href="{% url 'projeto_detail' projeto.pk %}">{{ projeto.titulo }}</a>
+                </td>
+                <td class="p-2 border border-border">{{ projeto.area_solicitante|default:'-' }}</td>
+                <td class="p-2 border border-border">{{ projeto.prioridade }}</td>
+                <td class="p-2 border border-border">
+                    <form method="post" action="{% url 'projeto_pegar' projeto.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="bg-primary text-white px-3 py-1 rounded-md hover:bg-primary-dark text-xs">Pegar projeto</button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td class="p-2 border border-border" colspan="4">Nenhum projeto aguardando atendimento.</td></tr>
             {% endfor %}
         </tbody>
     </table>

@@ -298,7 +298,8 @@ def chamado_status_update_view(request, pk):
 @atendente_required
 def esteira_view(request):
     chamados = Chamado.objects.filter(atendente__isnull=True, status='Novo').order_by('data_criacao')
-    return render(request, 'core/esteira.html', {'chamados': chamados})
+    projetos = Projeto.objects.filter(atendente__isnull=True, status='Novo').order_by('data_criacao')
+    return render(request, 'core/esteira.html', {'chamados': chamados, 'projetos': projetos})
 
 
 @login_required(login_url='login')
@@ -311,6 +312,19 @@ def chamado_pegar_view(request, pk):
         messages.success(request, 'Chamado atribuído a você.')
     else:
         messages.error(request, 'Esse chamado já foi atribuído a outro atendente.')
+    return redirect('esteira')
+
+
+@login_required(login_url='login')
+@atendente_required
+def projeto_pegar_view(request, pk):
+    atualizado = Projeto.objects.filter(pk=pk, atendente__isnull=True).update(
+        atendente=request.user, status='Em análise', data_atualizacao=timezone.now(),
+    )
+    if atualizado:
+        messages.success(request, 'Projeto atribuído a você.')
+    else:
+        messages.error(request, 'Esse projeto já foi atribuído a outro atendente.')
     return redirect('esteira')
 
 

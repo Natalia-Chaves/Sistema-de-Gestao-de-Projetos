@@ -95,6 +95,10 @@ class Projeto(models.Model):
     beneficio_esperado = models.TextField(blank=True, null=True)
     prazo_desejado = models.DateField(blank=True, null=True)
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='Novo', db_index=True)
+    atendente = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='projetos_atendidos',
+    )
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_atualizacao = models.DateTimeField(auto_now=True)
 
