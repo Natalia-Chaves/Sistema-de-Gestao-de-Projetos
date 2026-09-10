@@ -28,9 +28,9 @@ Além do login simples, o sistema possui um modelo de permissões por papel:
 
 - Backend: Python + Django
 - Frontend: Django Templates + Tailwind CSS (via CDN) + JavaScript
-- Banco: PostgreSQL (produção/Docker) ou SQLite (desenvolvimento local sem Docker)
+- Banco: PostgreSQL (produção) ou SQLite (desenvolvimento local)
 - Integração: API REST do GLPI, com fallback automático para modo simulado (mock)
-- Infra: Docker + Docker Compose + Nginx
+- Infra: Docker (imagem única, usada no deploy no Render) + WhiteNoise para arquivos estáticos
 
 ## Estrutura do projeto
 
@@ -38,16 +38,14 @@ Além do login simples, o sistema possui um modelo de permissões por papel:
 desafio_eqs/        # configurações do projeto Django (settings, urls)
 core/                # app principal: models, views, forms, integração GLPI, testes
 templates/core/      # templates HTML (Tailwind)
-nginx/               # configuração do proxy reverso usado no Docker
 Dockerfile
-docker-compose.yml
 entrypoint.sh
 requirements.txt
 ```
 
 ---
 
-## Opção 1 — Rodar localmente sem Docker (SQLite)
+## Rodar localmente (SQLite)
 
 Pré-requisitos: Python 3.12+.
 
@@ -63,30 +61,6 @@ python manage.py runserver
 
 Acesse http://127.0.0.1:8000. Sem preencher as variáveis `GLPI_*` no `.env`, a integração
 com o GLPI funciona em **modo simulado (mock)** automaticamente.
-
----
-
-## Opção 2 — Rodar com Docker (Postgres + Nginx)
-
-Pré-requisitos: Docker e Docker Compose instalados.
-
-```powershell
-copy .env.example .env
-docker compose up --build
-```
-
-- Aplicação (via Nginx): http://localhost:8080
-- O `entrypoint.sh` executa `migrate` e `collectstatic` automaticamente antes de subir o Gunicorn.
-- Para criar um usuário de acesso:
-
-```powershell
-docker compose exec web python manage.py createsuperuser
-```
-
-> **Observação:** o Docker não estava disponível no ambiente usado para gerar este
-> projeto, então a stack (Dockerfile + docker-compose + Nginx) foi revisada
-> manualmente mas não foi validada com `docker compose up` de ponta a ponta.
-> Rode localmente e me avise se algum ajuste for necessário.
 
 ---
 
@@ -181,8 +155,8 @@ validação de campo obrigatório vazio, criação de projeto e tela de detalhes
 - Versão do Django: 6.1.1
 - Banco utilizado: PostgreSQL (Docker) / SQLite (local)
 - Funcionalidades adicionais implementadas: dashboard com indicadores, tela de
-  detalhes do projeto, admin do Django para gestão de chamados/projetos, Docker +
-  Nginx para deploy em produção.
+  detalhes do projeto, admin do Django para gestão de chamados/projetos, Docker
+  para deploy em produção (Render).
 - Observações gerais: integração com o GLPI entregue em **modo simulado (mock)**,
   por não haver ambiente GLPI disponível para testes reais. O código de integração
   via API REST (`core/glpi_client.py`) está implementado e pronto para uso — basta
