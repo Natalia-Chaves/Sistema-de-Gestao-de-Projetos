@@ -34,6 +34,7 @@
                 <th class="p-2 border border-border">Área</th>
                 <th class="p-2 border border-border">Prioridade</th>
                 <th class="p-2 border border-border">Status</th>
+                <th class="p-2 border border-border">Atendente</th>
                 <th class="p-2 border border-border"></th>
             </tr>
         </thead>
@@ -44,7 +45,7 @@
                 <td class="p-2 border border-border">{{ projeto.area_solicitante }}</td>
                 <td class="p-2 border border-border">{{ projeto.prioridade }}</td>
                 <td class="p-2 border border-border">
-                    {% if user_perfil.papel == 'gestor_ti' or user_perfil.papel == 'gestor' %}
+                    {% if user_pode_atender %}
                     <form method="post" action="{% url 'projeto_status_update' projeto.pk %}" class="flex gap-1" data-confirm-status>
                         {% csrf_token %}
                         <select name="status" class="border border-border rounded p-1 text-xs" onchange="this.form.submit()">
@@ -57,10 +58,11 @@
                     {{ projeto.status }}
                     {% endif %}
                 </td>
+                <td class="p-2 border border-border">{% if projeto.atendente %}{{ projeto.atendente.get_full_name|default:projeto.atendente.username }}{% else %}-{% endif %}</td>
                 <td class="p-2 border border-border"><a class="text-primary font-semibold hover:underline" href="{% url 'projeto_detail' projeto.pk %}">Detalhes</a></td>
             </tr>
             {% empty %}
-            <tr><td class="p-2 border border-border" colspan="5">Nenhum projeto cadastrado.</td></tr>
+            <tr><td class="p-2 border border-border" colspan="6">Nenhum projeto cadastrado.</td></tr>
             {% endfor %}
         </tbody>
     </table>

@@ -27,6 +27,10 @@
             <dd>{{ projeto.prioridade }}</dd>
         </div>
         <div>
+            <dt class="font-semibold text-ink-secondary">Atendente</dt>
+            <dd>{% if projeto.atendente %}{{ projeto.atendente.get_full_name|default:projeto.atendente.username }}{% else %}Ainda não atribuído{% endif %}</dd>
+        </div>
+        <div>
             <dt class="font-semibold text-ink-secondary">Benefício esperado</dt>
             <dd>{{ projeto.beneficio_esperado|default:'Não informado' }}</dd>
         </div>

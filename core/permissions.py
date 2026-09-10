@@ -18,7 +18,7 @@ def gestor_ou_ti_required(view_func):
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
         if get_perfil(request.user).papel not in (Perfil.PAPEL_GESTOR, Perfil.PAPEL_GESTOR_TI):
-            messages.error(request, 'Você não tem permissão para alterar o status.')
+            messages.error(request, 'Você não tem permissão para gerenciar usuários.')
             return redirect('dashboard')
         return view_func(request, *args, **kwargs)
     return wrapper
@@ -38,7 +38,7 @@ def atendente_required(view_func):
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
         if not pode_atender_chamados(get_perfil(request.user)):
-            messages.error(request, 'Você não tem permissão para atender chamados.')
+            messages.error(request, 'Você não tem permissão para atender chamados ou projetos.')
             return redirect('dashboard')
         return view_func(request, *args, **kwargs)
     return wrapper

@@ -329,7 +329,7 @@ def projeto_pegar_view(request, pk):
 
 
 @login_required(login_url='login')
-@gestor_ou_ti_required
+@atendente_required
 def projeto_status_update_view(request, pk):
     projeto = get_object_or_404(Projeto, pk=pk)
     perfil = get_perfil(request.user)

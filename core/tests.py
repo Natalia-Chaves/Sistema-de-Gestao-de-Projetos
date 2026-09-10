@@ -137,6 +137,29 @@ class PapelPermissaoTests(TestCase):
         self.assertEqual(projeto.atendente, self.atendente_ti)
         self.assertEqual(projeto.status, 'Em análise')
 
+    def test_atendente_ti_pode_alterar_status_de_projeto(self):
+        projeto = Projeto.objects.create(
+            titulo='Projeto de outra área', area_solicitante='Qualidade',
+            descricao_problema='desc', objetivo='obj', prioridade='Alta',
+        )
+        self.client.login(username='atd1', password='senha123')
+        response = self.client.post(
+            reverse('projeto_status_update', args=[projeto.pk]), {'status': 'Aprovado'},
+        )
+        self.assertEqual(response.status_code, 302)
+        projeto.refresh_from_db()
+        self.assertEqual(projeto.status, 'Aprovado')
+
+    def test_colaborador_comum_nao_pode_alterar_status_de_projeto(self):
+        projeto = Projeto.objects.create(
+            titulo='Projeto do colaborador', area_solicitante='Qualidade',
+            descricao_problema='desc', objetivo='obj', prioridade='Alta',
+        )
+        self.client.login(username='colab1', password='senha123')
+        self.client.post(reverse('projeto_status_update', args=[projeto.pk]), {'status': 'Aprovado'})
+        projeto.refresh_from_db()
+        self.assertEqual(projeto.status, 'Novo')
+
     def test_colaborador_comum_nao_acessa_esteira(self):
         self.client.login(username='colab1', password='senha123')
         response = self.client.get(reverse('esteira'), follow=True)
