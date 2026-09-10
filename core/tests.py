@@ -158,6 +158,20 @@ class PapelPermissaoTests(TestCase):
         self.assertEqual(novo_perfil.user.last_name, 'Souza')
         self.assertTrue(novo_perfil.user.check_password('000456'))
 
+    def test_gestor_area_cria_colaborador_restrito_a_propria_area(self):
+        self.client.login(username='gestor1', password='senha123')
+        response = self.client.post(reverse('usuario_create'), {
+            'nome_completo': 'Carlos Souza',
+            'username': '000789',
+            'email': 'carlos@empresa.com',
+            'papel': Perfil.PAPEL_GESTOR,
+            'area': 'Qualidade',
+        })
+        self.assertEqual(response.status_code, 302)
+        novo_perfil = Perfil.objects.get(user__username='000789')
+        self.assertEqual(novo_perfil.papel, Perfil.PAPEL_COLABORADOR)
+        self.assertEqual(novo_perfil.area, 'TI')
+
     def test_matricula_deve_conter_apenas_numeros(self):
         self.client.login(username='ti1', password='senha123')
         response = self.client.post(reverse('usuario_create'), {

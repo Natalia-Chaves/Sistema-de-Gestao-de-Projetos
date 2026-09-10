@@ -4,7 +4,7 @@ from .glpi_client import GlpiClient, GlpiIntegrationError
 
 
 def _mock_chamado():
-    return {'id_glpi': f'MOCK-{random.randint(1000, 9999)}', 'origem': 'mock', 'erro': None}
+    return {'id_glpi': str(random.randint(1000, 9999)), 'origem': 'mock', 'erro': None}
 
 
 def enviar_chamado_glpi(titulo, descricao, categoria, prioridade):

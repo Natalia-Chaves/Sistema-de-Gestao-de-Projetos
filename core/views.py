@@ -6,6 +6,7 @@ from django.core.cache import cache
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, render, redirect
+from django.utils import timezone
 
 from .forms import AlterarSenhaForm, ChamadoForm, LoginForm, ProjetoForm, UsuarioForm
 from .models import Chamado, Perfil, Projeto
@@ -35,13 +36,12 @@ def login_view(request):
                 return render(request, 'core/login.html', {'form': form})
 
             usuario_encontrado = User.objects.filter(email__iexact=email).first()
-            user = None
-            if usuario_encontrado is not None:
-                user = authenticate(
-                    request,
-                    username=usuario_encontrado.username,
-                    password=form.cleaned_data['password'],
-                )
+            username_para_autenticar = usuario_encontrado.username if usuario_encontrado else email
+            user = authenticate(
+                request,
+                username=username_para_autenticar,
+                password=form.cleaned_data['password'],
+            )
             if user is not None:
                 cache.delete(chave_tentativas)
                 login(request, user)
@@ -304,11 +304,13 @@ def esteira_view(request):
 @login_required(login_url='login')
 @atendente_required
 def chamado_pegar_view(request, pk):
-    chamado = get_object_or_404(Chamado, pk=pk, atendente__isnull=True)
-    chamado.atendente = request.user
-    chamado.status = 'Em atendimento'
-    chamado.save()
-    messages.success(request, 'Chamado atribuído a você.')
+    atualizado = Chamado.objects.filter(pk=pk, atendente__isnull=True).update(
+        atendente=request.user, status='Em atendimento', data_atualizacao=timezone.now(),
+    )
+    if atualizado:
+        messages.success(request, 'Chamado atribuído a você.')
+    else:
+        messages.error(request, 'Esse chamado já foi atribuído a outro atendente.')
     return redirect('esteira')
 
 

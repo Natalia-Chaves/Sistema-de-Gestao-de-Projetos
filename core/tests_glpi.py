@@ -71,7 +71,7 @@ class EnviarChamadoGlpiTests(TestCase):
         resultado = enviar_chamado_glpi('Erro no login', 'descrição', 'Sistema', 'Alta')
         self.assertEqual(resultado['origem'], 'mock')
         self.assertIsNone(resultado['erro'])
-        self.assertTrue(resultado['id_glpi'].startswith('MOCK-'))
+        self.assertTrue(resultado['id_glpi'].isdigit())
 
     @override_settings(**GLPI_SETTINGS)
     @patch('core.glpi_client.requests.get')

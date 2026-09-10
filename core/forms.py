@@ -84,10 +84,10 @@ class UsuarioForm(forms.Form):
         if area_fixa:
             self.fields['papel'].choices = [(Perfil.PAPEL_COLABORADOR, 'Colaborador')]
             self.fields['papel'].initial = Perfil.PAPEL_COLABORADOR
-            self.fields['papel'].widget.attrs['disabled'] = True
+            self.fields['papel'].disabled = True
             self.fields['area'].choices = [(area_fixa, dict(Perfil._meta.get_field('area').choices).get(area_fixa, area_fixa))]
             self.fields['area'].initial = area_fixa
-            self.fields['area'].widget.attrs['disabled'] = True
+            self.fields['area'].disabled = True
 
     def clean_username(self):
         username = self.cleaned_data['username']

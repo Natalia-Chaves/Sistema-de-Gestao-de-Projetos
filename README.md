@@ -90,7 +90,7 @@ GLPI_USER_TOKEN=xxxx
 ```
 
 - Se essas variáveis **não estiverem preenchidas** (caso desta entrega), o sistema
-  usa um serviço mock (`core/services.py`), gerando um ID simulado (`MOCK-XXXX`) e
+  usa um serviço mock (`core/services.py`), gerando um ID numérico simulado (ex.: `4821`) e
   permitindo que toda a interface funcione normalmente.
 - Se estiverem preenchidas, o sistema tenta a API real do GLPI
   (`core/glpi_client.py`: `initSession` → criação do chamado → `killSession`).
