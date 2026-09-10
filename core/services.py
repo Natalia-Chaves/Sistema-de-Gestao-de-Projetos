@@ -1,10 +1,3 @@
-"""Camada de integração com o GLPI.
-
-Tenta usar a API real do GLPI quando configurada (GLPI_API_URL, GLPI_APP_TOKEN,
-GLPI_USER_TOKEN no .env). Caso não esteja configurada ou a chamada falhe,
-utiliza um serviço mock (modo simulado), documentando isso no retorno em
-`origem` ('real' ou 'mock') para a interface exibir isso ao usuário.
-"""
 import random
 
 from .glpi_client import GlpiClient, GlpiIntegrationError
@@ -15,7 +8,6 @@ def _mock_chamado():
 
 
 def enviar_chamado_glpi(titulo, descricao, categoria, prioridade):
-    """Envia um chamado ao GLPI. Retorna dict com id_glpi, origem e erro (se houver)."""
     client = GlpiClient()
 
     if not client.is_configured():

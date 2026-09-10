@@ -7,7 +7,6 @@ from .models import Perfil
 
 
 def get_perfil(user):
-    """Retorna o Perfil do usuário; superuser/staff sem perfil vira Gestor de Desenvolvimento implícito."""
     perfil = getattr(user, 'perfil', None)
     if perfil is not None:
         return perfil

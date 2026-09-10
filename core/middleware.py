@@ -7,8 +7,6 @@ CAMINHOS_LIVRES = ('/logout/', '/alterar-senha/')
 
 
 class ForcarTrocaSenhaMiddleware:
-    """Redireciona para a troca de senha enquanto o usuário estiver com senha temporária."""
-
     def __init__(self, get_response):
         self.get_response = get_response
 

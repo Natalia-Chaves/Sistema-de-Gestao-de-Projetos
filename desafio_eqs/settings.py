@@ -15,15 +15,10 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(BASE_DIR / '.env')
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')
 if not SECRET_KEY:
     if os.environ.get('DEBUG', 'True') == 'True':
@@ -31,7 +26,6 @@ if not SECRET_KEY:
     else:
         raise RuntimeError('SECRET_KEY não configurada. Defina a variável de ambiente SECRET_KEY.')
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if h.strip()]
@@ -40,13 +34,10 @@ CSRF_TRUSTED_ORIGINS = [
     o.strip() for o in os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',') if o.strip()
 ]
 
-# Configuração da integração com o GLPI (lida do .env, nunca hardcoded)
 GLPI_API_URL = os.environ.get('GLPI_API_URL', '')
 GLPI_APP_TOKEN = os.environ.get('GLPI_APP_TOKEN', '')
 GLPI_USER_TOKEN = os.environ.get('GLPI_USER_TOKEN', '')
 
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -90,10 +81,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'desafio_eqs.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/6.1/ref/settings/#databases
-# Usa PostgreSQL quando DB_ENGINE=postgres (Docker/produção); SQLite como fallback local.
-
 if os.environ.get('DB_ENGINE') == 'postgres':
     DATABASES = {
         'default': {
@@ -114,8 +101,6 @@ else:
     }
 
 
-# Cache compartilhado entre processos/workers (necessário para o bloqueio de
-# tentativas de login em produção com múltiplos workers do gunicorn).
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
@@ -123,9 +108,6 @@ CACHES = {
     }
 }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/6.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -143,9 +125,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/6.1/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'America/Sao_Paulo'
@@ -155,9 +134,6 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.1/howto/static-files/
-
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
@@ -165,9 +141,6 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# Security hardening. O nginx do docker-compose atual não faz terminação TLS
-# (apenas HTTP na porta 80), então SSL redirect/cookies seguros são opt-in via
-# env var — ative-os (SECURE_SSL=True) somente quando houver HTTPS na frente.
 SECURE_SSL_ENABLED = os.environ.get('SECURE_SSL', 'False') == 'True'
 SESSION_COOKIE_SECURE = SECURE_SSL_ENABLED
 CSRF_COOKIE_SECURE = SECURE_SSL_ENABLED
@@ -178,9 +151,6 @@ SECURE_HSTS_PRELOAD = SECURE_SSL_ENABLED
 X_FRAME_OPTIONS = 'DENY'
 SESSION_COOKIE_HTTPONLY = True
 
-
-# Email
-# https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
 MAILERS = {
     'default': {

@@ -1,4 +1,3 @@
-"""Testes da integração GLPI usando mocks de requests (sem chamadas HTTP reais)."""
 from unittest.mock import Mock, patch
 
 from django.test import TestCase, override_settings

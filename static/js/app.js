@@ -1,6 +1,4 @@
-// Interações client-side do Sistema de Chamados EQS.
 document.addEventListener('DOMContentLoaded', function () {
-    // Confirmação antes de alterar o status de um chamado/projeto.
     document.querySelectorAll('form[data-confirm-status]').forEach(function (form) {
         var select = form.querySelector('select[name="status"]');
         if (!select) return;
@@ -18,7 +16,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Contador de caracteres para o título do chamado (limite sugerido de 150).
     var tituloChamado = document.querySelector('#id_titulo');
     var contador = document.querySelector('#contador-titulo');
     if (tituloChamado && contador) {
@@ -31,7 +28,6 @@ document.addEventListener('DOMContentLoaded', function () {
         atualizarContador();
     }
 
-    // Evita duplo envio de formulários (desabilita o botão após o submit).
     document.querySelectorAll('form.js-single-submit').forEach(function (form) {
         form.addEventListener('submit', function () {
             var botao = form.querySelector('button[type="submit"]');
@@ -42,7 +38,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Fecha mensagens de feedback automaticamente após alguns segundos.
     document.querySelectorAll('[data-auto-dismiss]').forEach(function (item) {
         setTimeout(function () {
             item.style.transition = 'opacity 0.5s';

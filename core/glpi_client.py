@@ -1,18 +1,9 @@
-"""Cliente de integração com a API REST do GLPI.
-
-Etapas cobertas (conforme especificação do desafio):
-1. Configuração: URL/tokens lidos de variáveis de ambiente (nunca hardcoded).
-2. Autenticação: initSession usando App-Token + user token (ou login/senha).
-3. Criação: POST em /Ticket/ para abrir o chamado.
-4. Consulta: GET em /Ticket/{id} para status atualizado.
-5. Encerramento de sessão: killSession.
-"""
 import requests
 from django.conf import settings
 
 
 class GlpiIntegrationError(Exception):
-    """Erro de comunicação ou autenticação com a API do GLPI."""
+    pass
 
 
 class GlpiClient:
