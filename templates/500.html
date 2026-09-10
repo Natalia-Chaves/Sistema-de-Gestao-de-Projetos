@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Erro interno</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: {
+            eqs: { 500: "#C82026", 600: "#B51C21", 700: "#A8181D" },
+            dark: { 50: "#F5F6F8", 500: "#667085", 800: "#1F2933" },
+            primary: { DEFAULT: '#C82026', dark: '#A8181D' },
+            background: '#F5F6F8',
+            ink: { DEFAULT: '#1F2933', secondary: '#667085' },
+        } } };
+    </script>
+</head>
+<body class="bg-background text-ink min-h-screen flex items-center justify-center">
+    <div class="text-center">
+        <p class="text-6xl font-bold text-primary mb-2">500</p>
+        <p class="text-lg text-ink-secondary mb-6">Ocorreu um erro inesperado. Tente novamente em instantes.</p>
+        <a href="/" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark">Voltar ao início</a>
+    </div>
+</body>
+</html>

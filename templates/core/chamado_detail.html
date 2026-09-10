@@ -1,0 +1,49 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Detalhes do chamado{% endblock %}
+
+{% block content %}
+<div class="bg-surface rounded-card shadow-card border border-border p-6 max-w-2xl mx-auto">
+    <div class="flex justify-between items-start mb-4">
+        <h2 class="text-xl font-bold">{{ chamado.titulo }}</h2>
+        <span class="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full">{{ chamado.status }}</span>
+    </div>
+
+    <dl class="space-y-3 text-sm">
+        <div>
+            <dt class="font-semibold text-ink-secondary">Descrição</dt>
+            <dd class="whitespace-pre-line">{{ chamado.descricao }}</dd>
+        </div>
+        <div>
+            <dt class="font-semibold text-ink-secondary">Categoria</dt>
+            <dd>{{ chamado.categoria }}</dd>
+        </div>
+        <div>
+            <dt class="font-semibold text-ink-secondary">Prioridade</dt>
+            <dd>{{ chamado.prioridade }}</dd>
+        </div>
+        <div>
+            <dt class="font-semibold text-ink-secondary">Área</dt>
+            <dd>{{ chamado.area|default:'-' }}</dd>
+        </div>
+        <div>
+            <dt class="font-semibold text-ink-secondary">Usuário</dt>
+            <dd>{{ chamado.usuario }}</dd>
+        </div>
+        <div>
+            <dt class="font-semibold text-ink-secondary">ID GLPI</dt>
+            <dd>{{ chamado.id_glpi|default:'-' }}</dd>
+        </div>
+        <div>
+            <dt class="font-semibold text-ink-secondary">Criado em</dt>
+            <dd>{{ chamado.data_criacao }}</dd>
+        </div>
+        <div>
+            <dt class="font-semibold text-ink-secondary">Última atualização</dt>
+            <dd>{{ chamado.data_atualizacao }}</dd>
+        </div>
+    </dl>
+
+    <a href="{% url 'chamados' %}" class="inline-block mt-6 bg-ink-secondary text-white px-4 py-2 rounded-md hover:opacity-90">Voltar</a>
+</div>
+{% endblock %}

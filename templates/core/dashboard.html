@@ -1,0 +1,95 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="bg-surface rounded-card shadow-card border border-border p-6 mb-6">
+    <h2 class="text-xl font-bold mb-1">Dashboard</h2>
+    <p class="text-sm text-ink-secondary mb-4">
+        Acesso: <strong>{{ user_perfil.get_papel_display }}</strong>
+        {% if user_perfil.area %} · Área: <strong>{{ user_perfil.get_area_display }}</strong>{% endif %}
+    </p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="bg-primary/5 border-l-4 border-primary rounded-card p-4">
+            <p class="text-sm text-ink-secondary">Total de chamados</p>
+            <p class="text-3xl font-bold">{{ total_chamados }}</p>
+        </div>
+        <div class="bg-primary/5 border-l-4 border-primary rounded-card p-4">
+            <p class="text-sm text-ink-secondary">Total de projetos</p>
+            <p class="text-3xl font-bold">{{ total_projetos }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="bg-surface rounded-card shadow-card border border-border p-6 mb-6">
+    <h3 class="font-semibold mb-3">Chamados por status</h3>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {% for label, total in chamados_status_lista %}
+        <div class="bg-background rounded-card p-3 text-center">
+            <p class="text-xs text-ink-secondary">{{ label }}</p>
+            <p class="text-xl font-bold">{{ total }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="bg-surface rounded-card shadow-card border border-border p-6 mb-6">
+    <h3 class="font-semibold mb-3">Projetos por status</h3>
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        {% for label, total in projetos_status_lista %}
+        <div class="bg-background rounded-card p-3 text-center">
+            <p class="text-xs text-ink-secondary">{{ label }}</p>
+            <p class="text-xl font-bold">{{ total }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="bg-surface rounded-card shadow-card border border-border p-6 mb-6">
+    <h3 class="font-semibold mb-3">Últimos chamados</h3>
+    <table class="w-full text-sm">
+        <thead>
+            <tr class="bg-background text-left">
+                <th class="p-2 border border-border">Título</th>
+                <th class="p-2 border border-border">Status</th>
+                <th class="p-2 border border-border">Prioridade</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for chamado in chamados %}
+            <tr>
+                <td class="p-2 border border-border">{{ chamado.titulo }}</td>
+                <td class="p-2 border border-border">{{ chamado.status }}</td>
+                <td class="p-2 border border-border">{{ chamado.prioridade }}</td>
+            </tr>
+            {% empty %}
+            <tr><td class="p-2 border border-border" colspan="3">Nenhum chamado registrado.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="bg-surface rounded-card shadow-card border border-border p-6">
+    <h3 class="font-semibold mb-3">Últimos projetos</h3>
+    <table class="w-full text-sm">
+        <thead>
+            <tr class="bg-background text-left">
+                <th class="p-2 border border-border">Título</th>
+                <th class="p-2 border border-border">Status</th>
+                <th class="p-2 border border-border">Prioridade</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for projeto in projetos %}
+            <tr>
+                <td class="p-2 border border-border">{{ projeto.titulo }}</td>
+                <td class="p-2 border border-border">{{ projeto.status }}</td>
+                <td class="p-2 border border-border">{{ projeto.prioridade }}</td>
+            </tr>
+            {% empty %}
+            <tr><td class="p-2 border border-border" colspan="3">Nenhum projeto registrado.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

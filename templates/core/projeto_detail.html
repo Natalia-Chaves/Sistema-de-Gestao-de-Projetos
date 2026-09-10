@@ -1,0 +1,49 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Detalhes do projeto{% endblock %}
+
+{% block content %}
+<div class="bg-surface rounded-card shadow-card border border-border p-6 max-w-2xl mx-auto">
+    <div class="flex justify-between items-start mb-4">
+        <h2 class="text-xl font-bold">{{ projeto.titulo }}</h2>
+        <span class="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full">{{ projeto.status }}</span>
+    </div>
+
+    <dl class="space-y-3 text-sm">
+        <div>
+            <dt class="font-semibold text-ink-secondary">Área solicitante</dt>
+            <dd>{{ projeto.area_solicitante }}</dd>
+        </div>
+        <div>
+            <dt class="font-semibold text-ink-secondary">Descrição do problema</dt>
+            <dd class="whitespace-pre-line">{{ projeto.descricao_problema }}</dd>
+        </div>
+        <div>
+            <dt class="font-semibold text-ink-secondary">Objetivo</dt>
+            <dd class="whitespace-pre-line">{{ projeto.objetivo }}</dd>
+        </div>
+        <div>
+            <dt class="font-semibold text-ink-secondary">Prioridade</dt>
+            <dd>{{ projeto.prioridade }}</dd>
+        </div>
+        <div>
+            <dt class="font-semibold text-ink-secondary">Benefício esperado</dt>
+            <dd>{{ projeto.beneficio_esperado|default:'Não informado' }}</dd>
+        </div>
+        <div>
+            <dt class="font-semibold text-ink-secondary">Prazo desejado</dt>
+            <dd>{{ projeto.prazo_desejado|default:'Não informado' }}</dd>
+        </div>
+        <div>
+            <dt class="font-semibold text-ink-secondary">Criado em</dt>
+            <dd>{{ projeto.data_criacao }}</dd>
+        </div>
+        <div>
+            <dt class="font-semibold text-ink-secondary">Última atualização</dt>
+            <dd>{{ projeto.data_atualizacao }}</dd>
+        </div>
+    </dl>
+
+    <a href="{% url 'projetos' %}" class="inline-block mt-6 bg-ink-secondary text-white px-4 py-2 rounded-md hover:opacity-90">Voltar</a>
+</div>
+{% endblock %}

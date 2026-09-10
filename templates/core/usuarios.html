@@ -1,0 +1,37 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Usuários{% endblock %}
+
+{% block content %}
+<div class="bg-surface rounded-card shadow-card border border-border p-6">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold">Usuários (Colaboradores e Gestores)</h2>
+        <a class="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark" href="{% url 'usuario_create' %}">Novo usuário</a>
+    </div>
+
+    <table class="w-full text-sm">
+        <thead>
+            <tr class="bg-background text-left">
+                <th class="p-2 border border-border">Nome</th>
+                <th class="p-2 border border-border">Matrícula</th>
+                <th class="p-2 border border-border">E-mail</th>
+                <th class="p-2 border border-border">Papel</th>
+                <th class="p-2 border border-border">Área</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for perfil in perfis %}
+            <tr>
+                <td class="p-2 border border-border">{{ perfil.user.get_full_name|default:'-' }}</td>
+                <td class="p-2 border border-border">{{ perfil.user.username }}</td>
+                <td class="p-2 border border-border">{{ perfil.user.email }}</td>
+                <td class="p-2 border border-border">{{ perfil.get_papel_display }}</td>
+                <td class="p-2 border border-border">{{ perfil.get_area_display|default:'-' }}</td>
+            </tr>
+            {% empty %}
+            <tr><td class="p-2 border border-border" colspan="5">Nenhum usuário cadastrado ainda.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Chamados{% endblock %}
+
+{% block content %}
+<div class="bg-surface rounded-card shadow-card border border-border p-6">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold">Chamados</h2>
+        <a class="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark" href="{% url 'chamado_create' %}">Novo chamado</a>
+    </div>
+
+    <form method="get" class="flex flex-wrap gap-2 mb-4">
+        <input type="text" name="q" value="{{ filtro_q }}" placeholder="Buscar por título ou descrição" class="border border-border rounded-md p-2 text-sm flex-1 min-w-[200px]">
+        <select name="status" class="border border-border rounded-md p-2 text-sm">
+            <option value="">Todos os status</option>
+            {% for value, label in status_choices %}
+            <option value="{{ value }}" {% if filtro_status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <select name="prioridade" class="border border-border rounded-md p-2 text-sm">
+            <option value="">Todas as prioridades</option>
+            {% for value, label in prioridade_choices %}
+            <option value="{{ value }}" {% if filtro_prioridade == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="bg-ink-secondary text-white px-4 py-2 rounded-md hover:opacity-90 text-sm">Filtrar</button>
+        <a href="{% url 'chamados' %}" class="px-4 py-2 text-sm text-ink-secondary hover:underline">Limpar</a>
+    </form>
+
+    <table class="w-full text-sm">
+        <thead>
+            <tr class="bg-background text-left">
+                <th class="p-2 border border-border">Título</th>
+                <th class="p-2 border border-border">Categoria</th>
+                <th class="p-2 border border-border">Prioridade</th>
+                <th class="p-2 border border-border">Área</th>
+                <th class="p-2 border border-border">Status</th>
+                <th class="p-2 border border-border">ID GLPI</th>
+                <th class="p-2 border border-border">Usuário</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for chamado in chamados %}
+            <tr>
+                <td class="p-2 border border-border">
+                    <a class="text-primary hover:underline" href="{% url 'chamado_detail' chamado.pk %}">{{ chamado.titulo }}</a>
+                </td>
+                <td class="p-2 border border-border">{{ chamado.categoria }}</td>
+                <td class="p-2 border border-border">{{ chamado.prioridade }}</td>
+                <td class="p-2 border border-border">{{ chamado.area|default:'-' }}</td>
+                <td class="p-2 border border-border">
+                    {% if user_perfil.papel == 'gestor_ti' or user_perfil.papel == 'gestor' %}
+                    <form method="post" action="{% url 'chamado_status_update' chamado.pk %}" class="flex gap-1" data-confirm-status>
+                        {% csrf_token %}
+                        <select name="status" class="border border-border rounded p-1 text-xs" onchange="this.form.submit()">
+                            {% for value, label in chamado.STATUS_CHOICES %}
+                            <option value="{{ value }}" {% if chamado.status == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                    {% else %}
+                    {{ chamado.status }}
+                    {% endif %}
+                </td>
+                <td class="p-2 border border-border">{{ chamado.id_glpi|default:'-' }}</td>
+                <td class="p-2 border border-border">{{ chamado.usuario }}</td>
+            </tr>
+            {% empty %}
+            <tr><td class="p-2 border border-border" colspan="7">Nenhum chamado cadastrado.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% include 'core/_pagination.html' %}
+</div>
+{% endblock %}

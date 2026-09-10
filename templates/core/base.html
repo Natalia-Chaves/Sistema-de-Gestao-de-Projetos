@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema de Chamados EQS{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: {
+            colors: {
+                eqs: {
+                    50: "#FEF2F2",
+                    100: "#FDE8E8",
+                    200: "#F9C8CA",
+                    300: "#F29A9D",
+                    400: "#E5656A",
+                    500: "#C82026",
+                    600: "#B51C21",
+                    700: "#A8181D",
+                    800: "#861419",
+                    900: "#641014",
+                },
+                dark: {
+                    50: "#F5F6F8",
+                    100: "#E8EBEF",
+                    200: "#D1D6DC",
+                    300: "#AAB2BC",
+                    400: "#7C8794",
+                    500: "#667085",
+                    600: "#475467",
+                    700: "#344054",
+                    800: "#1F2933",
+                    900: "#151B21",
+                },
+                primary: { DEFAULT: '#C82026', dark: '#A8181D', light: '#E5656A' },
+                background: '#F5F6F8',
+                surface: { DEFAULT: '#FFFFFF', dark: '#1F2933' },
+                ink: { DEFAULT: '#1F2933', secondary: '#667085', light: '#FFFFFF' },
+                border: '#E1E5EA',
+                success: '#198754',
+                warning: '#D97706',
+                danger: '#DC2626',
+                info: '#2563EB',
+            },
+            boxShadow: {
+                card: '0 1px 3px rgba(16, 24, 40, 0.08)',
+                elevated: '0 4px 12px rgba(16, 24, 40, 0.10)',
+            },
+            borderRadius: {
+                card: '12px',
+            },
+        } } };
+    </script>
+    <script src="{% static 'js/app.js' %}" defer></script>
+</head>
+<body class="bg-background text-ink min-h-screen">
+    {% if user.is_authenticated %}
+    <nav class="bg-primary text-white px-6 py-3 flex justify-between items-center">
+        <span class="font-bold">Sistema de Chamados EQS</span>
+        <div class="space-x-4">
+            <a class="font-semibold hover:underline" href="{% url 'dashboard' %}">Dashboard</a>
+            <a class="font-semibold hover:underline" href="{% url 'chamados' %}">Chamados</a>
+            <a class="font-semibold hover:underline" href="{% url 'projetos' %}">Projetos</a>
+            {% if user_perfil.papel == 'gestor_ti' %}
+            <a class="font-semibold hover:underline" href="{% url 'usuarios' %}">Usuários</a>
+            {% endif %}
+            <span class="text-white/70">| {{ user.get_full_name|default:user.username }} ({{ user_perfil.get_papel_display }})</span>
+            <a class="font-semibold hover:underline" href="{% url 'logout' %}">Sair</a>
+        </div>
+    </nav>
+    {% endif %}
+
+    <div class="max-w-5xl mx-auto p-6">
+        {% if messages %}
+        <ul class="mb-5 space-y-2">
+            {% for message in messages %}
+                <li data-auto-dismiss class="rounded-md px-4 py-2 border
+                    {% if message.tags == 'success' %}bg-success/10 text-success border-success/30{% endif %}
+                    {% if message.tags == 'error' %}bg-danger/10 text-danger border-danger/30{% endif %}
+                    {% if message.tags == 'warning' %}bg-warning/10 text-warning border-warning/30{% endif %}
+                    {% if message.tags == 'info' %}bg-info/10 text-info border-info/30{% endif %}">
+                    {{ message }}
+                </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

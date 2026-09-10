@@ -1,0 +1,25 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="bg-surface rounded-card shadow-card border border-border p-6 max-w-2xl mx-auto">
+    <h2 class="text-xl font-bold mb-4">{{ title }}</h2>
+    <form method="post" class="space-y-4 js-single-submit">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="flex flex-col gap-1">
+                <label class="font-medium text-sm" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <small class="text-danger">{{ field.errors|join:', ' }}</small>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <div class="flex gap-3 pt-2">
+            <button type="submit" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark">Salvar</button>
+            <a href="{% url 'usuarios' %}" class="bg-ink-secondary text-white px-4 py-2 rounded-md hover:opacity-90">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
