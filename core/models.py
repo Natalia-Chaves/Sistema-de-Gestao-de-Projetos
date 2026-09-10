@@ -1,3 +1,5 @@
+import uuid
+
 from django.conf import settings
 from django.db import models
 
@@ -87,6 +89,7 @@ class Projeto(models.Model):
         ('Alta', 'Alta'),
     ]
 
+    codigo = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     titulo = models.CharField(max_length=150)
     area_solicitante = models.CharField(max_length=50, choices=AREA_CHOICES, db_index=True)
     descricao_problema = models.TextField()

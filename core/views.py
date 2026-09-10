@@ -197,22 +197,7 @@ def chamado_create_view(request):
             )
             chamado.id_glpi = resultado.get('id_glpi')
             chamado.save()
-            if resultado.get('origem') == 'mock' and resultado.get('erro'):
-                messages.warning(
-                    request,
-                    f'Chamado registrado localmente. Integração com GLPI indisponível '
-                    f'(modo simulado): {resultado["erro"]}',
-                )
-            elif resultado.get('origem') == 'mock':
-                messages.info(
-                    request,
-                    'Chamado registrado com sucesso (integração GLPI em modo simulado).',
-                )
-            else:
-                messages.success(
-                    request,
-                    f'Chamado registrado com sucesso no GLPI (ID {resultado.get("id_glpi")}).',
-                )
+            messages.success(request, 'Chamado registrado com sucesso.')
             return redirect('chamados')
     else:
         form = ChamadoForm()

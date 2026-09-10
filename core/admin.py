@@ -19,6 +19,6 @@ class ChamadoAdmin(admin.ModelAdmin):
 
 @admin.register(Projeto)
 class ProjetoAdmin(admin.ModelAdmin):
-    list_display = ('titulo', 'area_solicitante', 'prioridade', 'status', 'data_criacao')
+    list_display = ('codigo', 'titulo', 'area_solicitante', 'prioridade', 'status', 'data_criacao')
     list_filter = ('status', 'prioridade')
-    search_fields = ('titulo', 'area_solicitante', 'descricao_problema')
+    search_fields = ('codigo', 'titulo', 'area_solicitante', 'descricao_problema')

@@ -30,6 +30,7 @@
     <table class="w-full text-sm">
         <thead>
             <tr class="bg-background text-left">
+                <th class="p-2 border border-border">ID</th>
                 <th class="p-2 border border-border">Título</th>
                 <th class="p-2 border border-border">Área</th>
                 <th class="p-2 border border-border">Prioridade</th>
@@ -41,6 +42,7 @@
         <tbody>
             {% for projeto in projetos %}
             <tr>
+                <td class="p-2 border border-border">{{ projeto.codigo }}</td>
                 <td class="p-2 border border-border">{{ projeto.titulo }}</td>
                 <td class="p-2 border border-border">{{ projeto.area_solicitante }}</td>
                 <td class="p-2 border border-border">{{ projeto.prioridade }}</td>
@@ -62,7 +64,7 @@
                 <td class="p-2 border border-border"><a class="text-primary font-semibold hover:underline" href="{% url 'projeto_detail' projeto.pk %}">Detalhes</a></td>
             </tr>
             {% empty %}
-            <tr><td class="p-2 border border-border" colspan="6">Nenhum projeto cadastrado.</td></tr>
+            <tr><td class="p-2 border border-border" colspan="7">Nenhum projeto cadastrado.</td></tr>
             {% endfor %}
         </tbody>
     </table>

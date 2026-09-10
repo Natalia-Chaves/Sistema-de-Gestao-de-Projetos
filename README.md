@@ -150,7 +150,7 @@ validação de campo obrigatório vazio, criação de projeto e tela de detalhes
 | Acesso | Login (e-mail + senha), identificação do usuário logado, portal com acesso a Chamados e Projetos |
 | Chamados | Abertura, campos obrigatórios (título, descrição, categoria, prioridade), integração GLPI real/mock, ID do GLPI, listagem com busca/filtro, tela de detalhes, status |
 | Esteira (recurso extra) | Fila de chamados sem atendimento, "pegar chamado" (atribui a si e muda o status) |
-| Projetos | Abertura, campos obrigatórios (título, área, descrição, objetivo, prioridade), campos opcionais (benefício, prazo), ID único, listagem com busca/filtro, fluxo de status, tela de detalhes |
+| Projetos | Abertura, campos obrigatórios (título, área, descrição, objetivo, prioridade), campos opcionais (benefício, prazo), ID único exibido, listagem com busca/filtro, fluxo de status, tela de detalhes |
 | Dashboard | Totais e contagem por status de chamados e projetos, filtrados pelo papel/área de quem está logado |
 | Auditoria | Data de criação e última atualização em todos os registros |
 | Erros | Validação de formulário e tratamento de falha de integração com mensagens claras |
