@@ -101,35 +101,6 @@ GLPI_USER_TOKEN=xxxx
 
 ---
 
-## Deploy em produção
-
-### Recomendado: Render (aplicação única)
-
-
-Este projeto é uma aplicação Django com templates renderizados no servidor
-(não é uma SPA/API separada de um frontend estático). Por isso, o deploy
-correto é um **serviço único** contendo backend + frontend juntos:
-
-1. Suba o repositório no GitHub.
-2. No Render, crie um **Web Service** a partir do repositório, usando o `Dockerfile`
-   deste projeto (Render detecta e builda automaticamente).
-3. Crie um banco **PostgreSQL** no Render e configure as variáveis de ambiente do
-   serviço (`DB_ENGINE=postgres`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`,
-   `DB_PORT`) com os dados fornecidos pelo Render.
-4. Configure `SECRET_KEY`, `DEBUG=False`, `ALLOWED_HOSTS` (domínio do Render) e
-   `CSRF_TRUSTED_ORIGINS` nas variáveis de ambiente do serviço.
-5. Configure as variáveis `GLPI_*` se for usar a integração real.
-
-> **Nota sobre Vercel:** a Vercel é otimizada para frontends estáticos ou funções
-> serverless (Next.js, React, etc.) e não é adequada para hospedar uma aplicação
-> Django com templates renderizados no servidor, sessões e conexão persistente a
-> banco de dados. Como este projeto não separa frontend (JS) e backend (API) — o
-> Django Templates faz as duas coisas —, o deploy único no Render é o caminho que
-> realmente funciona. Uma separação real (Django REST Framework + frontend em
-> Next.js na Vercel) exigiria reescrever o frontend do zero, fora do escopo deste
-> desafio.
-
----
 
 ## Testes automatizados
 
@@ -159,7 +130,7 @@ validação de campo obrigatório vazio, criação de projeto e tela de detalhes
 
 ## Guia de teste
 
-### Usuários de teste
+### Usuários de teste (local)
 
 Contas para testar cada papel (senha = a própria matrícula, será pedida a troca no
 primeiro login):
@@ -231,21 +202,3 @@ primeiro login):
    projeto tem `data_criacao` e `data_atualizacao` preenchidos automaticamente.
 
 ---
-
-## Registro da entrega
-
-- Nome do participante: _preencher_
-- Data de início: _preencher_
-- Data de entrega: _preencher_
-- Link do repositório: _preencher_
-- Versão do Python: 3.12
-- Versão do Django: 6.1.1
-- Banco utilizado: PostgreSQL (Docker) / SQLite (local)
-- Funcionalidades adicionais implementadas: dashboard com indicadores por papel/área, tela de
-  detalhes do chamado e do projeto, esteira de atendimento para colaboradores da área de TI,
-  admin do Django para gestão de chamados/projetos, login por e-mail, Docker para deploy em
-  produção (Render).
-- Observações gerais: integração com o GLPI entregue em **modo simulado (mock)**,
-  por não haver ambiente GLPI disponível para testes reais. O código de integração
-  via API REST (`core/glpi_client.py`) está implementado e pronto para uso — basta
-  configurar `GLPI_API_URL`, `GLPI_APP_TOKEN` e `GLPI_USER_TOKEN` no `.env`.
